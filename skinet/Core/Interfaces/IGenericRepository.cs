@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Entities;
 using Core.Specifications;
 
@@ -13,10 +9,10 @@ namespace Core.Interfaces
         Task<IReadOnlyList<T>> GetAllAsync(); 
 
         Task<T> GetEntityWithSpec(ISpecification<T> spec);
-        //making the query
+        //passing specific query
 
         Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
-        //passing query to ToListAsync() function
+        //passing query to get list from ToListAsync() function
         
     }
 }
