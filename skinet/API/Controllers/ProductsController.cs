@@ -1,4 +1,5 @@
 using API.DTO;
+using API.Errors;
 using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
@@ -7,9 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<Product> _prod;
         private readonly IGenericRepository<ProductBrand> _brand;
@@ -59,6 +58,8 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)] //for swagger
         // public async Task<ActionResult<Product>> GetProduct(int id){
         //     // return Ok(await _prod.GetByIdAsync(id));    
         //     var p = new ProductWithTypesAndBrandsSpecification(id); //this will contain where condition in criteria and list of all includes
@@ -78,6 +79,8 @@ namespace API.Controllers
             //         ProductType=result.ProductType.Name,
             //         ProductBrand=result.ProductBrand.Name,
             // };
+
+            if(result==null) return NotFound(new ApiResponse(404));
             return _mapper.Map<Product,ProductToReturnDTO>(result);        
         }
         
