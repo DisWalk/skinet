@@ -13,6 +13,8 @@ namespace Core.Interfaces
 
         Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
         //passing query to get list from ToListAsync() function
+
+        Task<int> CountAsync(ISpecification<T> spec);
         
     }
 }

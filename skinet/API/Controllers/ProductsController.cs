@@ -1,5 +1,6 @@
 using API.DTO;
 using API.Errors;
+using API.Helpers;
 using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
@@ -23,62 +24,27 @@ namespace API.Controllers
         }
 
         [HttpGet] 
-        // public async Task<ActionResult<IReadOnlyList<Product>>> GetAllProducts(){
-        //     // return Ok(await _prod.GetAllAsync()); 
-        //     // BaseSpecification<Product> p = new BaseSpecification<Product>(null);
-        //     // p.Includes.Add(p => p.ProductBrand);
-        //     // p.Includes.Add(p => p.ProductType);
-        //     // return Ok(await  _prod.GetAsync(p)); 
+        public async Task<ActionResult<Pagination<ProductToReturnDTO>>> GetAllProducts([FromQuery]ProductSpecParams productParams){
+            var spec = new ProductWithTypesAndBrandsSpecification(productParams);
 
-        //     var p = new ProductWithTypesAndBrandsSpecification();
-        //     return Ok(await _prod.GetAsync(p)); //taking specification as parameter  
-        // }
+            var countSpec = new ProductWithFiltersForCountSpecification(productParams);
 
-        public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetAllProducts(){
-            // return Ok(await _prod.GetAllAsync()); 
-            // BaseSpecification<Product> p = new BaseSpecification<Product>(null);
-            // p.Includes.Add(p => p.ProductBrand);
-            // p.Includes.Add(p => p.ProductType);
-            // return Ok(await  _prod.GetAsync(p)); 
+            var totalItems = await _prod.CountAsync(countSpec);
 
-            var p = new ProductWithTypesAndBrandsSpecification();
-            var res = await _prod.GetAsync(p);
-            // return res.Select(result => new ProductToReturnDTO{
-            //         Id=result.Id,
-            //         Name=result.Name,
-            //         Description=result.Description,
-            //         Price=result.Price,
-            //         PictureUrl=result.PictureUrl,
-            //         ProductType=result.ProductType.Name,
-            //         ProductBrand=result.ProductBrand.Name
-            // }).ToList();//taking specification as parameter  
+            var products = await _prod.GetAsync(spec);
 
-            //return Ok(res.Select(result => _mapper.Map<Product,ProductToReturnDTO>(result)).ToList());
-            return Ok(_mapper.Map<IReadOnlyList<Product>,IReadOnlyList<ProductToReturnDTO>>(res));
+            var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDTO>>(products);
+
+            return Ok(new Pagination<ProductToReturnDTO>(productParams.PageIndex,productParams.PageSize,totalItems,data));
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)] //for swagger
-        // public async Task<ActionResult<Product>> GetProduct(int id){
-        //     // return Ok(await _prod.GetByIdAsync(id));    
-        //     var p = new ProductWithTypesAndBrandsSpecification(id); //this will contain where condition in criteria and list of all includes
-        //     return Ok(await _prod.GetEntityWithSpec(p));
-        // }
-
+        
         public async Task<ActionResult<ProductToReturnDTO>> GetProduct(int id){
-            // return Ok(await _prod.GetByIdAsync(id));    
-            var p = new ProductWithTypesAndBrandsSpecification(id); //this will contain where condition in criteria and list of all includes
+            var p = new ProductWithTypesAndBrandsSpecification(id); 
             var result = await _prod.GetEntityWithSpec(p);
-            // return new ProductToReturnDTO{  //returning flattened object
-            //         Id=result.Id,
-            //         Name=result.Name,
-            //         Description=result.Description,
-            //         Price=result.Price,
-            //         PictureUrl=result.PictureUrl,
-            //         ProductType=result.ProductType.Name,
-            //         ProductBrand=result.ProductBrand.Name,
-            // };
 
             if(result==null) return NotFound(new ApiResponse(404));
             return _mapper.Map<Product,ProductToReturnDTO>(result);        
