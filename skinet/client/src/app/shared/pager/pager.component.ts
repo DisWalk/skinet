@@ -1,0 +1,18 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-pager',
+  templateUrl: './pager.component.html',
+  styleUrl: './pager.component.scss'
+})
+export class PagerComponent {
+  @Input() totalCount?: number 
+  @Input() pageSize?: number 
+  @Output() pageChanged = new EventEmitter<number>()
+  //as it will outout a number
+
+  onPagerChanged(event: any) {
+    this.pageChanged.emit(event.page)
+    //to emit the event out of this component
+  }
+}
