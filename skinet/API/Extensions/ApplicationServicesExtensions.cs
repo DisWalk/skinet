@@ -23,11 +23,14 @@ namespace API.Extensions
                 return ConnectionMultiplexer.Connect(options);
             });
 
-        //to utilise them as a service which we can inject in Controllers
+        //to make them available them as a service which we can inject in Controllers
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IOrderService, OrderService>();
         services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.Configure<ApiBehaviorOptions>(options =>

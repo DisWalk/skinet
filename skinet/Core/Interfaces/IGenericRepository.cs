@@ -15,6 +15,12 @@ namespace Core.Interfaces
         //passing query to get list from ToListAsync() function
 
         Task<int> CountAsync(ISpecification<T> spec);
-        
+
+        //these are not performing db operations
+        //just manipulating entity data in memory
+        //hence no need of async
+        void Add(T entity);
+        void Update(T entity);
+        void Delete(T entity);
     }
 }
