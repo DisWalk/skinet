@@ -11,8 +11,16 @@ export class BasketComponent {
 
   constructor(public basketService: BasketService) { }
   
-  totalCount(items: BasketItem[]) {
-    return items.reduce((total, x) => total += x.quantity, 0);
+  // totalCount(items: BasketItem[]) {
+  //   return items.reduce((total, x) => total += x.quantity, 0);
+  // }
+
+  incrementQuantity(item: BasketItem) {
+    this.basketService.addItemtoBasket(item);
+  }
+
+  removeItem(event: { id: number, quantity: number }) {
+    this.basketService.removeItemfromBasket(event.id, event.quantity);
   }
 
   

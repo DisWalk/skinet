@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Basket, BasketItem, BasketTotals } from '../shared/models/basket';
 import { HttpClient } from '@angular/common/http';
 import { Product } from '../shared/models/product';
+import { DeliveryMethod } from '../shared/models/deliveryMethod';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,14 @@ export class BasketService {
   //very useful feature as we know cart will be needed in nultiple components
   //as its in Service, its singleton
 
+  shipping = 0;
+
   constructor(private http: HttpClient) { }
+
+  setShippingPrice(deliveryMethod: DeliveryMethod) {
+    this.shipping = deliveryMethod.price;
+    this.CalculateTotals();
+  }
 
   getBasket(id: string) {
     return this.http.get<Basket>(this.baseUrl + 'basket?id=' + id).subscribe({
@@ -74,11 +82,15 @@ export class BasketService {
   deleteBasket(basket: Basket) {
     return this.http.delete(this.baseUrl + 'basket?id=' + basket.id).subscribe({
       next: () => {
+        this.deleteLocalBasket();
+      }
+    })
+  }
+
+  deleteLocalBasket() {
         this.basketSource.next(null)
         this.basketTotalSource.next(null)
         localStorage.removeItem('basket_id')
-      }
-    })
   }
 
   
@@ -112,12 +124,13 @@ export class BasketService {
   }
 
   private CalculateTotals() {
+    // const subtotal = basket.items.reduce((total, item) => total += (item.quantity * item.price), 0);
+
     const basket = this.getCurrentBasketValue();
     if (!basket) return;
-    const shipping = 0;
-    const subtotal = basket.items.reduce((total, item) => total += (item.quantity * item.price), 0);
-    const total = subtotal + shipping;
-    this.basketTotalSource.next({ shipping, subtotal, total });
+    const subtotal = basket.items.reduce((a, b) => (b.price * b.quantity) + a, 0);
+    const total = subtotal + this.shipping;
+    this.basketTotalSource.next({shipping: this.shipping, total, subtotal});
   }
 
   private isProduct(item: Product | BasketItem): item is Product {

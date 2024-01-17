@@ -1,40 +1,30 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { BehaviorSubject, ReplaySubject, map, of } from 'rxjs';
-import { User } from '../shared/models/user';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { map, of, ReplaySubject } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { Address, User } from '../shared/models/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   baseUrl = environment.apiUrl;
-  // private currentUserSource = new BehaviorSubject<User | null>(null);
   private currentUserSource = new ReplaySubject<User | null>(1);
-  //when we refresh the checkout page, i.e when appln starts
-  //BehaviorSubject currentUserSource will be null
-  //that's why auth is null and page redirects to login
-  //so we replace BehaviorSubject with ReplaySubject
-  //ReplaySubject doesnt have an initial value
-  //auth guard wont do anything until we have initial value in user observable
-  //(1) is saying to store 1 user only i.e. current user
   currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient, private router: Router) { }
-  
-  loadCurrentUser(token: string | null) {
 
-    if (token === null) {
+  loadCurrentUser(token: string | null) {
+    if (token == null) {
       this.currentUserSource.next(null);
       return of(null);
-      //returning observable of null as below code is returning observable
     }
 
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', `Bearer ${token}`);
-    
-    return this.http.get<User>(this.baseUrl + 'account', { headers }).pipe(
+
+    return this.http.get<User>(this.baseUrl + 'account', {headers}).pipe(
       map(user => {
         if (user) {
           localStorage.setItem('token', user.token);
@@ -44,7 +34,7 @@ export class AccountService {
           return null;
         }
       })
-    );
+    )
   }
 
   login(values: any) {
@@ -54,11 +44,6 @@ export class AccountService {
         this.currentUserSource.next(user);
       })
     )
-    //we wil pass email and password to api
-    //api will return user.ts i.e. email displayName and token
-    //we will save that token in User's browser's local storage
-    //so that they dont have to login everytime
-    //like we use amazon, flipcart 
   }
 
   register(values: any) {
@@ -66,7 +51,7 @@ export class AccountService {
       map(user => {
         localStorage.setItem('token', user.token);
         this.currentUserSource.next(user);
-      }) 
+      })
     )
   }
 
@@ -78,5 +63,13 @@ export class AccountService {
 
   checkEmailExists(email: string) {
     return this.http.get<boolean>(this.baseUrl + 'account/emailExists?email=' + email);
+  }
+
+  getUserAddress() {
+    return this.http.get<Address>(this.baseUrl + 'account/address');
+  }
+
+  updateUserAddress(address: Address) {
+    return this.http.put(this.baseUrl + 'account/address', address);
   }
 }
