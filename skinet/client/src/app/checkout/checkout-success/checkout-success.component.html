@@ -2,6 +2,7 @@
     <div>
         <i class="fa fa-check-circle fa-5x" style="color: green;"></i>
     </div>
-    <h2>Thank you. Your order is confirmed</h2>
-    <button class="btn btn-outline-success">View your order</button>
+    <h2 *ngIf="order">Thank you. Your order is confirmed</h2>
+    <button routerLink="/orders/{{order.id}}" *ngIf="order"class="btn btn-outline-success">View your Order# {{order.id}}</button>
+    <button routerLink="/orders" *ngIf="order == undefined"class="btn btn-outline-success">View your orders </button>
 </div>

@@ -9,6 +9,7 @@ import { BasketService } from '../../basket/basket.service';
   templateUrl: './checkout-delivery.component.html',
   styleUrl: './checkout-delivery.component.scss'
 })
+  
 export class CheckoutDeliveryComponent implements OnInit{
   @Input() checkoutForm?: FormGroup;
   deliveryMethod: DeliveryMethod[] = [];

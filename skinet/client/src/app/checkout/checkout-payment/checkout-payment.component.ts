@@ -27,7 +27,7 @@ export class CheckoutPaymentComponent {
       next: order => {
         this.ts.success("Order created successfully!");
         this.bs.deleteLocalBasket();  //to show empty basket in UI
-        const navigationExtras: NavigationExtras = { state: order };
+        const navigationExtras: NavigationExtras = { state: { order:order } };
         this.rl.navigate(['checkout/success'], navigationExtras);
       }
     })
