@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AccountService } from '../account/account.service';
+import { BasketService } from '../basket/basket.service';
 
 @Component({
   selector: 'app-checkout',
@@ -9,8 +10,11 @@ import { AccountService } from '../account/account.service';
 })
 export class CheckoutComponent {
 
-  constructor(private fb: FormBuilder, private accountService: AccountService) { 
+  constructor(private fb: FormBuilder, private accountService: AccountService,private basketService: BasketService) { 
     this.getAddressFormValues();
+    this.getDeliveryMethodValue();
+    //even if we leave checkout page, go back and update cart, address and delivery method will be populated
+    //so we are remembering address and delivery method values
   }
   
   //match name with value in formGroupName formControlName html 
@@ -38,5 +42,13 @@ export class CheckoutComponent {
       }
     })
   }
+
+  getDeliveryMethodValue() {
+    const basket = this.basketService.getCurrentBasketValue();
+    if (basket && basket.deliveryMethodId) {
+      this.checkoutForm.get('deliveryForm')?.get('deliveryMethod')?.patchValue(basket.deliveryMethodId.toString());
+    }
+  }
+
 
 }

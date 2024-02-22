@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { Basket, BasketItem, BasketTotals } from '../shared/models/basket';
 import { HttpClient } from '@angular/common/http';
 import { Product } from '../shared/models/product';
@@ -21,13 +21,26 @@ export class BasketService {
   //very useful feature as we know cart will be needed in nultiple components
   //as its in Service, its singleton
 
-  shipping = 0;
 
   constructor(private http: HttpClient) { }
 
+  createPaymentIntent() {
+    return this.http.post<Basket>(this.baseUrl + 'payments/' + this.getCurrentBasketValue()?.id, {}).pipe(
+      map(basket => {
+        this.basketSource.next(basket);
+      })
+    )
+  }
+
   setShippingPrice(deliveryMethod: DeliveryMethod) {
-    this.shipping = deliveryMethod.price;
-    this.CalculateTotals();
+    const basket = this.getCurrentBasketValue();
+    if (basket) { //adding deliveryMethodId and shippingPrice in basket
+      console.log("deliveryMethod.price\n"+deliveryMethod.price)
+      basket.shippingPrice = deliveryMethod.price;
+      console.log("basket.shippingPrice\n"+basket.shippingPrice)
+      basket.deliveryMethodId = deliveryMethod.id;
+      this.setBasket(basket);
+    }
   }
 
   getBasket(id: string) {
@@ -41,7 +54,7 @@ export class BasketService {
 
   setBasket(basket: Basket) {
     return this.http.post<Basket>(this.baseUrl + 'basket' ,basket).subscribe({
-      next: x => {
+    next: x => {
         this.basketSource.next(x),
         this.CalculateTotals();
       }
@@ -129,8 +142,8 @@ export class BasketService {
     const basket = this.getCurrentBasketValue();
     if (!basket) return;
     const subtotal = basket.items.reduce((a, b) => (b.price * b.quantity) + a, 0);
-    const total = subtotal + this.shipping;
-    this.basketTotalSource.next({shipping: this.shipping, total, subtotal});
+    const total = subtotal + basket.shippingPrice;
+    this.basketTotalSource.next({shipping: basket.shippingPrice, total, subtotal});
   }
 
   private isProduct(item: Product | BasketItem): item is Product {

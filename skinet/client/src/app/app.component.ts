@@ -16,7 +16,7 @@ export class AppComponent implements OnInit{
   constructor(private basketService: BasketService,private accountService: AccountService){}
 
   ngOnInit(): void {  //to get basket data after starting appln
-    this.loadBasket();
+    this.loadBasket();  //this is why we get redis error on home page
     this.loadCurrentUser();
   }
 
