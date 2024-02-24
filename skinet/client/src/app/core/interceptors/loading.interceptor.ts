@@ -20,10 +20,11 @@ export class LoadingInterceptor implements HttpInterceptor {
     //   //and loading full page for every input is bad UX 
     // }
     if (request.url.includes('emailExists') || 
-      request.method === 'POST' && request.url.includes('orders')
+      request.method === 'POST' && request.url.includes('orders') || request.method === 'DELETE'
     ) {
       return next.handle(request);
       //no full page loader for submit order click
+      //no loader for redis bakste delete after order is placed
     }
 
     this.busyService.busy(); 

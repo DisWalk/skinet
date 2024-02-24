@@ -23,6 +23,7 @@ namespace API.Controllers
             _prod = prod;
         }
 
+        [Cached(600)]   //CachedAttribute(int timeToLiveSeconds)
         [HttpGet] 
         public async Task<ActionResult<Pagination<ProductToReturnDTO>>> GetAllProducts([FromQuery]ProductSpecParams productParams){
             var spec = new ProductWithTypesAndBrandsSpecification(productParams);
@@ -38,6 +39,7 @@ namespace API.Controllers
             return Ok(new Pagination<ProductToReturnDTO>(productParams.PageIndex,productParams.PageSize,totalItems,data));
         }
 
+        [Cached(600)] 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)] //for swagger
@@ -50,11 +52,13 @@ namespace API.Controllers
             return _mapper.Map<Product,ProductToReturnDTO>(result);        
         }
         
+        [Cached(600)] 
         [HttpGet("brands")] 
         public  async Task<ActionResult<IReadOnlyList<Product>>> GetAllBands(){
             return Ok(await _brand.GetAllAsync()); 
         }
 
+        [Cached(600)] 
         [HttpGet("types")] 
         public  async Task<ActionResult<IReadOnlyList<Product>>> GetAllTypes(){
             return Ok(await _type.GetAllAsync()); 

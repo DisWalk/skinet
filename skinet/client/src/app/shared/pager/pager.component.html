@@ -3,9 +3,13 @@
 [totalItems]="totalCount"
 [itemsPerPage]="pageSize"
 [maxSize]="10"
+[ngModel]="pageNumber"  
 (pageChanged)="onPagerChanged($event)"
 previousText="&lsaquo;"
 nextText="&rsaquo;"
 firstText="&laquo;"
 lastText="&raquo;">
 </pagination>
+
+<!-- [ngModel]="pageNumber"  
+to remember page number after we click back on product details page -->

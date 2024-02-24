@@ -4,10 +4,14 @@
           <h5 class="text-warning ms-3">Sort</h5>
           <select class="form-select mb-4" (change)="onSortSelected($event)">
                 <option *ngFor="let x of sortOptions"
+                [selected]="shopParams.sort === x.value"
                 [value]="x.value"
             >{{x.name}}
             </option>
           </select>
+
+                <!-- [selected]="shopParams.sort === x.value" -->
+<!-- to enable cache -->
 
           <h5 class="text-warning ms-3">Brands</h5>
             <ul class="list-group my-3">
@@ -66,6 +70,7 @@
               <app-pager
                 [totalCount]="totalCount"
                 [pageSize]="shopParams.pageSize"
+                [pageNumber]="shopParams.pageNumber"
                 (pageChanged)="onPageChanged($event)"
               ></app-pager>
             </div>

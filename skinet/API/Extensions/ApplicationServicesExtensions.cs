@@ -24,6 +24,11 @@ namespace API.Extensions
             });
 
         //to make them available them as a service which we can inject in Controllers
+
+        //we want cache to be singleton, i.e. be readily available 
+        services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+
+        //addscoped means these services are scoped to a request
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IBasketRepository, BasketRepository>();
